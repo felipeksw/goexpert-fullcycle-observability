@@ -2,6 +2,21 @@
 FullCycle - Pós Go Expert Desafio - Observabilidade &amp; Open Telemetry
 
 ## Entregáveis
+1. Clone do repositório com o comando: git clone `https://github.com/felipeksw/goexpert-fullcycle-observability.git`
+2. Para iniciar a aplicação, execute o comando `docker-compose up -d` na raiz do repositório
+3. Acesso o Zipkin em: `http://{HOST}:9411`
+4. Para realizar uma chamda ao **Serviço A** execute o comando:
+```sh
+curl --request POST \
+  --url http://{HOST}:8080/zipcode/ \
+  --header 'Content-Type: application/json' \
+  --data '{"cep":"13015100"}'
+```
+5. Para realizar uma chamda ao **Serviço B** execute o comando:
+```sh
+curl --request GET \
+  --url http://{HOST}:8081/zipcode/13015100
+```
 
 ## Requisitos
 Objetivo: Desenvolver um sistema em Go que receba um CEP, identifica a cidade e retorna o clima atual (temperatura em graus celsius, fahrenheit e kelvin) juntamente com a cidade. Esse sistema deverá implementar OTEL(Open Telemetry) e Zipkin.
