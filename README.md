@@ -1,5 +1,5 @@
 # goexpert-fullcycle-observability
-FullCycle - Pós Go Expert Desafio - Observabilidade &amp; Open Telemetry
+FullCycle - Pós Go Expert Labs - Observabilidade &amp; Open Telemetry
 
 ## Entregáveis
 1. Clone do repositório com o comando: git clone `https://github.com/felipeksw/goexpert-fullcycle-observability.git`
