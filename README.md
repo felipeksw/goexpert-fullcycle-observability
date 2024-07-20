@@ -2,8 +2,8 @@
 FullCycle - Pós Go Expert Labs - Observabilidade &amp; Open Telemetry
 
 ## Entregáveis
-1. Clone do repositório com o comando: git clone `https://github.com/felipeksw/goexpert-fullcycle-observability.git`
-2. Para iniciar a aplicação, execute o comando `docker-compose up -d` na raiz do repositório
+1. Clone o repositório com o comando: `git clone https://github.com/felipeksw/goexpert-fullcycle-observability.git`
+2. Para iniciar a aplicação, execute o comando na raiz do repositório: `docker-compose up -d`
 3. Acesso o Zipkin em: `http://{HOST}:9411`
 4. Para realizar uma chamda ao **Serviço A** execute o comando:
 ```sh
