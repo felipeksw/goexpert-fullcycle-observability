@@ -10,6 +10,7 @@ import (
 
 	"github.com/felipeksw/goexpert-fullcycle-observability/service-b-weather/internal/dto"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type LocaleFinder struct {
@@ -33,10 +34,13 @@ func (l *LocaleFinder) Execute(ctx context.Context, zipcode string) (interface{}
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, "http://"+os.Getenv("SERVICE_A_HOST")+":"+os.Getenv("SERVICE_A_PORT")+"/zipcode/", bytes.NewBuffer(inputJson))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://"+os.Getenv("SERVICE_A_HOST")+":"+os.Getenv("SERVICE_A_PORT")+"/zipcode/", bytes.NewBuffer(inputJson))
 	if err != nil {
 		return nil, err
 	}
+
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
+
 	req.Header.Set("Content-type", "application/json")
 	res, err := l.httpClient.Do(req)
 	if err != nil {

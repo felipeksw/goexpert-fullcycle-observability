@@ -10,6 +10,7 @@ import (
 
 	"github.com/felipeksw/goexpert-fullcycle-observability/service-a-zipcode/internal/dto"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type LocaleFinder struct {
@@ -25,11 +26,13 @@ func (l *LocaleFinder) Execute(ctx context.Context, zipcode string) (*dto.Locale
 	_, span := tracer.Start(ctx, "zipcode-search")
 	defer span.End()
 
-	req, err := http.NewRequest(http.MethodGet, "https://viacep.com.br/ws/"+url.QueryEscape(zipcode)+"/json/", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://viacep.com.br/ws/"+url.QueryEscape(zipcode)+"/json/", nil)
 	if err != nil {
 		return nil, err
 	}
 	slog.Debug("[calling api]", "url", req.URL)
+
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
 
 	res, err := l.httpClient.Do(req)
 	if err != nil {

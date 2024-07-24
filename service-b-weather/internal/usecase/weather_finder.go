@@ -12,6 +12,7 @@ import (
 
 	"github.com/felipeksw/goexpert-fullcycle-observability/service-b-weather/internal/dto"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type WeatherFinder struct {
@@ -27,11 +28,13 @@ func (w *WeatherFinder) Execute(ctx context.Context, zipcode string) (interface{
 	_, span := tracer.Start(ctx, "weather-search")
 	defer span.End()
 
-	req, err := http.NewRequest(http.MethodGet, "https://api.weatherapi.com/v1/current.json?key="+os.Getenv("KEY_WEATHER_API")+"&q="+url.QueryEscape(zipcode), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://api.weatherapi.com/v1/current.json?key="+os.Getenv("KEY_WEATHER_API")+"&q="+url.QueryEscape(zipcode), nil)
 	if err != nil {
 		return nil, err
 	}
 	slog.Debug("[calling api]", "url", req.URL)
+
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(req.Header))
 
 	//req.Header.Set("Content-type", "application/json")
 
