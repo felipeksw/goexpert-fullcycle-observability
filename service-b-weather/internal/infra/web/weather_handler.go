@@ -3,6 +3,7 @@ package web
 import (
 	"encoding/json"
 	"log/slog"
+	"math"
 	"net/http"
 	"regexp"
 
@@ -102,9 +103,9 @@ func (h *WeatherHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	result := dto.ResultOutput{
 		City:  localeOutput.Localidade,
-		TempC: weatherOutput.Current.TempC,
-		TempF: weatherOutput.Current.TempF,
-		TempK: weatherOutput.Current.TempC + 273.15,
+		TempC: math.Round(weatherOutput.Current.TempC*10) / 10,
+		TempF: math.Round(weatherOutput.Current.TempF*10) / 10,
+		TempK: math.Round((weatherOutput.Current.TempC+273.15)*10) / 10,
 	}
 
 	_ = json.NewEncoder(w).Encode(result)
