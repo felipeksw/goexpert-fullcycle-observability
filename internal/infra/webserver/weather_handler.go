@@ -8,13 +8,13 @@ import (
 	"github.com/felipeksw/goexpert-fullcycle-cloud-run/internal/entity"
 	"github.com/felipeksw/goexpert-fullcycle-cloud-run/internal/usecase"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 func GetWeatherByZipcodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
-	//ctx, span := tracer.Start(ctx, "GetWeatherByZipcodeHandler")
-	//defer span.End()
+	ctx = otel.GetTextMapPropagator().Extract(ctx, propagation.HeaderCarrier(r.Header))
 
 	tracer := otel.Tracer("weatherByZipcode-tracer")
 
