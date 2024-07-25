@@ -13,6 +13,7 @@ import (
 	"github.com/felipeksw/goexpert-fullcycle-cloud-run/internal/usecase"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"go.opentelemetry.io/otel"
 )
 
 func TestNewAddressByZipcodeSuccess(t *testing.T) {
@@ -28,10 +29,12 @@ func TestNewAddressByZipcodeSuccess(t *testing.T) {
 		Body:       io.NopCloser(bytes.NewReader([]byte(mockZipcodeResponseSuccessBody))),
 	}, nil)
 
+	tracer := otel.Tracer("test")
+
 	mockZipcodeDto, err := entity.NewZipcode(mockCepSuccess)
 	assert.Nil(t, err)
 
-	addressDto, err := usecase.NewAddressByZipcode(context.Background(), *mockZipcodeDto, mockClient)
+	addressDto, err := usecase.NewAddressByZipcode(context.Background(), tracer, *mockZipcodeDto, mockClient)
 	assert.Nil(t, err)
 
 	add, err := json.Marshal(addressDto)
@@ -53,10 +56,12 @@ func TestNewAddressByZipcodeCepNotFound(t *testing.T) {
 		Body:       io.NopCloser(bytes.NewReader([]byte(mockZipcodeResponseErrorBody))),
 	}, nil)
 
+	tracer := otel.Tracer("test")
+
 	mockZipcodeDto, err := entity.NewZipcode(mockCepSuccess)
 	assert.Nil(t, err)
 
-	addressDto, err := usecase.NewAddressByZipcode(context.Background(), *mockZipcodeDto, mockClient)
+	addressDto, err := usecase.NewAddressByZipcode(context.Background(), tracer, *mockZipcodeDto, mockClient)
 	assert.Equal(t, "zip code not found", err.Error())
 	assert.Nil(t, addressDto)
 }

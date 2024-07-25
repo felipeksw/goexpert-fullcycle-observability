@@ -14,6 +14,7 @@ import (
 	"github.com/felipeksw/goexpert-fullcycle-cloud-run/internal/usecase"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"go.opentelemetry.io/otel"
 )
 
 func TestNewWeatherByAddressSuccess(t *testing.T) {
@@ -33,7 +34,9 @@ func TestNewWeatherByAddressSuccess(t *testing.T) {
 		Body:       io.NopCloser(bytes.NewReader([]byte(mockWeatherResponseSuccessBody))),
 	}, nil)
 
-	weatherDto, err := usecase.NewWeatherByAddress(context.Background(), mockAddressSuccess, mockClient)
+	tracer := otel.Tracer("test")
+
+	weatherDto, err := usecase.NewWeatherByAddress(context.Background(), tracer, mockAddressSuccess, mockClient)
 	assert.Nil(t, err)
 
 	wea, err := json.Marshal(weatherDto)
@@ -65,7 +68,9 @@ func TestNewWeatherByAddressAddressNotFount(t *testing.T) {
 		Body:       io.NopCloser(bytes.NewReader([]byte(mockWeatherResponseErrorBody))),
 	}, nil)
 
-	weatherDto, err := usecase.NewWeatherByAddress(context.Background(), mockAddressError, mockClient)
+	tracer := otel.Tracer("test")
+
+	weatherDto, err := usecase.NewWeatherByAddress(context.Background(), tracer, mockAddressError, mockClient)
 	slog.Info("[test struct]", "weatherDto", weatherDto)
 
 	assert.Nil(t, weatherDto)
