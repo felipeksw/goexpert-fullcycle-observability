@@ -5,43 +5,50 @@ services:
     ports:
       - "9411:9411"
 
-  service-a-zipcode:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    restart: always
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"
+
+  service-a:
     image: golang:latest
-    container_name: service-a-zipcode
+    container_name: service-a
     ports:
       - "8080:8080"
     environment:
-      - OTEL_EXPORTER_ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - SERVICE_A_PORT=8080
+      - SERVICE_B_PORT=8081
+      - SERVICE_B_HOST=service-b
     volumes:
       - .:/app
     command: >
       sh -c "
       cd /app &&
       go mod tidy &&
-      GOOS=linux CGO_ENABLED=0 go build -ldflags='-w -s' -o ./build/service-a-zipcode ./service-a-zipcode/cmd/main.go &&
-      ./build/service-a-zipcode"
+      GOOS=linux CGO_ENABLED=0 go build -ldflags='-w -s' -o ./build/service-a ./cmd/service-a/main.go &&
+      ./build/service-a"
     depends_on:
       - zipkin
 
-  service-b-weather:
+  service-b:
     image: golang:latest
-    container_name: service-b-weather
+    container_name: service-b
     ports:
       - "8081:8081"
     environment:
-      - OTEL_EXPORTER_ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
       - SERVICE_B_PORT=8081
-      - SERVICE_A_HOST=service-a-zipcode
-      - SERVICE_A_PORT=8080
-      - KEY_WEATHER_API=fb9f540724614991af651016242806
+      - WEATHER_API_KEY=fb9f540724614991af651016242806
     volumes:
       - .:/app
     command: >
       sh -c "
       cd /app && 
       go mod tidy &&
-      GOOS=linux CGO_ENABLED=0 go build -ldflags='-w -s' -o ./build/service-b-weather ./service-b-weather/cmd/main.go &&
-      ./build/service-b-weather"
+      GOOS=linux CGO_ENABLED=0 go build -ldflags='-w -s' -o ./build/service-b ./cmd/service-b/main.go &&
+      ./build/service-b"
     depends_on:
       - zipkin
